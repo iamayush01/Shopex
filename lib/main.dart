@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+//My imports
+//import 'components/horizontal_list.dart';
 
 void main() {
   runApp(
@@ -13,6 +16,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List imageList = [
+    {"id": 1, "image_path": 'assets/images/cr1.jpg'},
+    {"id": 2, "image_path": 'assets/images/cr2.jpg'},
+  ];
+  final CarouselController carouselController = CarouselController();
+  int currindex = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,6 +114,105 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+      body: ListView(children: <Widget>[
+        Stack(
+          children: [
+            InkWell(
+              onTap: () {},
+              child: CarouselSlider(
+                items: imageList
+                    .map(
+                      (item) => Image.asset(
+                        item['image_path'],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    )
+                    .toList(),
+                carouselController: carouselController,
+                options: CarouselOptions(
+                  scrollPhysics: const BouncingScrollPhysics(),
+                  autoPlay: true,
+                  aspectRatio: 2,
+                  viewportFraction: 1,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      currindex = index;
+                    });
+                  },
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 10,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: imageList.asMap().entries.map((entry) {
+                  return GestureDetector(
+                    onTap: () => carouselController.animateToPage(entry.key),
+                    child: Container(
+                      width: currindex == entry.key ? 17 : 7,
+                      height: 7.0,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 3.0,
+                      ),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: currindex == entry.key
+                              ? Colors.white
+                              : Colors.cyan),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text("Categories"),
+        ),
+        Container(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    itemCount: 10,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) => Container(
+                      height: 100,
+                      width: 100,
+                      margin: const EdgeInsets.all(10),
+                      color: Colors.green[600],
+                      child: Center(
+                        child: Text(
+                          "Card $index",
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: ListView.builder(
+                    itemCount: 15,
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) => ListTile(
+                      title: Text("List $index"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ]),
     );
   }
 }
